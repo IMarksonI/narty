@@ -12,7 +12,7 @@ if ($wzrost < 100 || $wzrost > 220) {
     exit;
 }
 
-// Wylicz rekomendowaną długość nart
+// Jakaś czarna magia
 $procent = 0.9;
 if ($styl === 'rekreacyjny') $procent = 0.85;
 if ($styl === 'sportowy') $procent = 0.95;
@@ -26,7 +26,6 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Pobierz model o najbliższej długości
 $sql = "SELECT model, dlugosc FROM narty ORDER BY ABS(dlugosc - ?) ASC LIMIT 1";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $dlugosc);
@@ -36,7 +35,7 @@ $result = $stmt->get_result();
 if ($row = $result->fetch_assoc()) {
     $model = $row['model'];
     $dlugosc_baza = $row['dlugosc'];
-    // Przygotuj nazwę pliku na podstawie modelu (bez spacji, polskich znaków itp.)
+    // model
     $filename = 'img/' . preg_replace('/[^A-Za-z0-9_\-]/', '', $model) . '.jpg';
     if (!file_exists($filename)) {
         $filename = 'img/default.jpg'; // domyślne zdjęcie jeśli brak pliku
