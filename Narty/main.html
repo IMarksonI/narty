@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wypożyczalnia Nart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Wypożyczalnia Nart | Raków-Częstochowa</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#o-nartach">O nartach</a></li>
+            <li><a href="#rodzaje-nart">Rodzaje nart</a></li>
+            <li><a href="#kontakt">Kontakt</a></li>
+        </ul>
+    </nav>
+    <main>
+        <form id="ski-form" onsubmit="return dobierzNarty();">
+            <h2>Dobierz najlepsze narty dla siebie</h2>
+            <div class="row">
+                <div class="field">
+                    <label for="wzrost">Twój wzrost (cm):</label>
+                    <input type="number" id="wzrost" name="wzrost" min="100" max="220" required>
+                </div>
+                <div class="field">
+                    <label for="waga">Twoja waga (kg):</label>
+                    <input type="number" id="waga" name="waga" min="30" max="150" required>
+                </div>
+            </div>
+            
+            <div class="full-width">
+                <label for="poziom">Poziom zaawansowania:</label>
+                <select id="poziom" name="poziom" required>
+                    <option value="">Wybierz...</option>
+                    <option value="poczatkujacy">Początkujący</option>
+                    <option value="sredniozaawansowany">Średniozaawansowany</option>
+                    <option value="zaawansowany">Zaawansowany</option>
+                </select>
+            </div>
+
+            <div class="full-width">
+                <label for="styl">Styl jazdy:</label>
+                <select id="styl" name="styl" required>
+                    <option value="">Wybierz...</option>
+                    <option value="rekreacyjny">Rekreacyjny</option>
+                    <option value="sportowy">Sportowy</option>
+                    <option value="freeride">Freeride</option>
+                </select>
+            </div>
+
+            <button type="submit">Dobierz narty</button>
+            <div id="wynik-narty" style="margin-top: 1em; font-weight: bold;"></div>
+        </form>
+
+        <script>
+        function dobierzNarty() {
+            const formData = new FormData(document.getElementById('ski-form'));
+            fetch('dobierz_narty.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Błąd sieci');
+                return res.json();
+            })
+            .then(data => {
+                const wynikDiv = document.getElementById('wynik-narty');
+                wynikDiv.classList.remove('show'); // reset animacji
+                void wynikDiv.offsetWidth; // wymusza reflow, by animacja działała za każdym razem
+
+                if (data.error) {
+                    wynikDiv.innerText = data.error;
+                } else {
+                    wynikDiv.innerHTML =
+                        `<img src="${data.img}" alt="Zdjęcie nart" style="max-width:200px;"><br>
+                        Model: ${data.model}<br>
+                        Rekomendowana długość nart: ${data.dlugosc} cm<br>
+                        Poziom: ${data.poziom}<br>
+                        Waga: ${data.waga}<br>
+                        Styl: ${data.styl}`;
+                }
+                wynikDiv.classList.add('show');
+            })
+            .catch(err => {
+                document.getElementById('wynik-narty').innerText = 'Wystąpił błąd: ' + err.message;
+            });
+            return false; // Zapobiega przeładowaniu strony
+        }
+        </script>
+    </main>
+    <footer>
+        <p>&copy; 2023 Wszystko o Nartach. Wszelkie prawa zastrzeżone.</p>
+    </footer>
+</body>
+</html>
